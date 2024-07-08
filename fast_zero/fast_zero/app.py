@@ -12,6 +12,7 @@ from .schemas import (
     UserPublic,
     UserSchema,
 )
+from .security import get_password_hash
 
 app = FastAPI()
 
@@ -58,7 +59,9 @@ def create_user(user: UserSchema, session=Depends(get_session)):
             )
 
     db_user = User(
-        username=user.username, password=user.password, email=user.email
+        username=user.username,
+        password=get_password_hash(user.password),
+        email=user.email,
     )
     session.add(db_user)
     session.commit()
@@ -84,7 +87,7 @@ def update_user(user_id: int, user: UserSchema, session=Depends(get_session)):
         )
 
     db_user.username = user.username
-    db_user.password = user.password
+    db_user.password = get_password_hash(user.password)
     db_user.email = user.email
     session.commit()
     session.refresh(db_user)
