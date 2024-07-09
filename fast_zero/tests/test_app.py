@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+from fast_zero.schemas import UserPublic
+
 
 def test_root_deve_retornar_ok_e_ola_mundo(client):
     # Act (Ação)
@@ -34,40 +36,42 @@ def test_create_user(client):
 
 
 def test_read_users(client):
-    response = client.get('/users/')
+    response = client.get('/users/?limit=10&offset=0')
 
     assert response.status_code == HTTPStatus.OK
-    assert response.json() == {
-        'users': [
-            {
-                'username': 'testusername',
-                'email': 'test@email.com',
-                'id': 1,
-            }
-        ]
-    }
+    assert response.json() == {'users': []}
 
 
-def test_update_user(client):
+def test_read_users_with_user(client, user):
+    user_schema = UserPublic.model_validate(user).model_dump()
+
+    response = client.get('/users/?limit=10&offset=0')
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {'users': [user_schema]}
+
+
+def test_update_user(client, user):
     response = client.put(
         '/users/1',
         json={
-            'username': 'testusername2',
-            'email': 'test@email.com',
-            'password': 'secret123',
+            'username': 'teste',
+            'email': 'teste@teste.com',
+            'password': '1234',
             'id': 1,
         },
     )
 
+    # Verify the update was successful
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {
-        'username': 'testusername2',
-        'email': 'test@email.com',
+        'username': 'teste',
+        'email': 'teste@teste.com',
         'id': 1,
     }
 
 
-def test_delete_user(client):
+def test_delete_user(client, user):
     response = client.delete('/users/1')
 
     assert response.json() == {'message': 'Usuário deletado com sucesso!'}

@@ -4,7 +4,13 @@ from http.client import HTTPException
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
-from fast_zero.schemas import Message, UserDB, UserList, UserPublic, UserSchema
+from fast_zero.fast_zero.schemas import (
+    Message,
+    UserDB,
+    UserList,
+    UserPublic,
+    UserSchema,
+)
 
 app = FastAPI()
 
